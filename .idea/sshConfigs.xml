@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig host="10.68.25.32" id="126f37be-fb32-41eb-83e3-541452aa130a" keyPath="C:\Users\12099\.ssh\id_ed25519" port="22" nameFormat="DESCRIPTIVE" username="zhangxu" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" id="ee42ccd2-965a-47c7-8361-51c0702fb83d" customName="3090" nameFormat="CUSTOM" useOpenSSHConfig="true">
+        <option name="customName" value="3090" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>
