@@ -112,13 +112,6 @@ curl -X POST http://localhost:8000/search \
 - `TIR_PRETRAINED`（默认 `openai`）
 - `TIR_DEVICE`（`cuda` / `cpu`，默认自动）
 - `TIR_INDEX_DIR`（默认 `data/index`）
-- `TIR_TRANSLATE_ENABLED`（默认 `true`，启用中文→英文翻译，仅影响向量检索路径）
-- `TIR_TRANSLATE_PROVIDER`（默认 `google`，使用在线翻译）
-- `TIR_TRANSLATE_SOURCE`（默认 `zh`）
-- `TIR_TRANSLATE_TARGET`（默认 `en`）
-- `TIR_TRANSLATE_ONLY_CJK`（默认 `true`，仅当文本包含中文时翻译）
-
-说明：翻译依赖在线服务（`deep-translator` 的 Google Translator）。如果不希望联网或翻译失败，设为 `TIR_TRANSLATE_ENABLED=false`。
 
 ---
 
