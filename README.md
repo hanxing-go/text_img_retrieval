@@ -17,6 +17,8 @@
 根据你的 CUDA 版本，按照官方选择器安装 PyTorch。
 （如果你想使用 GPU，请在安装依赖项之前完成此步骤。）
 
+如果出现“GPU 不兼容”的提示，可先设置 `TIR_DEVICE=cpu` 以使用 CPU 运行。
+
 然后：
 
 ```bash
@@ -115,7 +117,36 @@ curl -X POST http://localhost:8000/search \
 
 ---
 
-## 7) 提高领域精度的注意事项
+## 7) 中文→英文离线翻译（检索前自动翻译）
+当查询文本为中文时，服务会先离线翻译为英文再进行检索。
+
+### 7.1 安装离线翻译依赖
+`requirements.txt` 已包含 `argostranslate`，安装依赖后即可使用。
+
+### 7.2 准备离线模型（Argos）
+下载中文→英文的 Argos 模型（`.argosmodel` 文件），放在本地路径，例如：
+```
+data/models/translate-zh_en.argosmodel
+```
+
+也可以用脚本在线下载（仅用于准备离线模型）：
+```bash
+python scripts/download_argos_model.py --source zh --target en --out_dir data/models
+```
+
+### 7.3 配置环境变量（推荐）
+```
+TIR_TRANSLATE_ENABLED=1
+TIR_TRANSLATE_SOURCE=zh
+TIR_TRANSLATE_TARGET=en
+TIR_TRANSLATE_MODEL_PATH=data/models/translate-zh_en.argosmodel
+```
+
+说明：当文本不包含中文字符时会跳过翻译；服务启动时会自动安装 `TIR_TRANSLATE_MODEL_PATH` 指定的本地模型。
+
+---
+
+## 8) 提高领域精度的注意事项
 - 在 `aliases` 和 `model_std` 映射上投入精力——这可以保证“提供模型 => 精确结果”。
 - 对于“无模型”情况，内置的提示集成有助于基于形状的检索。
 - 如果你想进一步提高精度，可以添加**领域微调**（使用困难负样本进行 CLIP 对比微调）。

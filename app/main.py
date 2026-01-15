@@ -11,15 +11,17 @@ from .schemas import SearchRequest, SearchResponse, SearchHit
 from .clip_encoder import CLIPEncoder
 from .db import open_db
 from .searcher import Searcher
+from .translator import OfflineTranslator
 
 app = FastAPI(title="Text→Image Retrieval (Model+Desc JSON)", version="1.0.0")
 
 _session: Session | None = None
 _encoder: CLIPEncoder | None = None
 _searcher: Searcher | None = None
+_translator: OfflineTranslator | None = None
 
 def _load():
-    global _session, _encoder, _searcher
+    global _session, _encoder, _searcher, _translator
     idx_dir = Path(settings.INDEX_DIR)
     faiss_path = idx_dir / "index.faiss"
     idmap_path = idx_dir / "id_map.json"
@@ -39,6 +41,14 @@ def _load():
     _encoder = CLIPEncoder(settings.MODEL_NAME, settings.PRETRAINED, device=settings.DEVICE)
     _searcher = Searcher(_session, index=index, id_map=id_map, prompt_templates=settings.PROMPT_TEMPLATES)
 
+    if settings.TRANSLATE_ENABLED:
+        _translator = OfflineTranslator(
+            source_lang=settings.TRANSLATE_SOURCE,
+            target_lang=settings.TRANSLATE_TARGET,
+            model_path=settings.TRANSLATE_MODEL_PATH,
+            only_when_cjk=settings.TRANSLATE_ONLY_WHEN_CJK,
+        )
+
 @app.on_event("startup")
 def startup_event():
     _load()
@@ -48,7 +58,12 @@ def health():
     return {
         "ok": True,
         "model": {"name": settings.MODEL_NAME, "pretrained": settings.PRETRAINED, "device": settings.DEVICE},
-        "index_dir": settings.INDEX_DIR
+        "index_dir": settings.INDEX_DIR,
+        "translation": {
+            "enabled": settings.TRANSLATE_ENABLED,
+            "source": settings.TRANSLATE_SOURCE,
+            "target": settings.TRANSLATE_TARGET,
+        },
     }
 
 @app.post("/search", response_model=SearchResponse)
@@ -58,6 +73,10 @@ def search(req: SearchRequest):
 
     model = (req.model or "").strip()
     desc = (req.desc or "").strip()
+
+    if _translator is not None:
+        model = _translator.translate_if_needed(model)
+        desc = _translator.translate_if_needed(desc)
 
     # 1) model-exact path
     if model:

@@ -14,6 +14,13 @@ class Settings(BaseSettings):
     # Device: "cuda" / "cpu" / "auto"
     DEVICE: str = "auto"
 
+    # Offline translation (Chinese -> English)
+    TRANSLATE_ENABLED: bool = True
+    TRANSLATE_SOURCE: str = "zh"
+    TRANSLATE_TARGET: str = "en"
+    TRANSLATE_MODEL_PATH: str | None = "data/models/translate-zh_en.argosmodel"
+    TRANSLATE_ONLY_WHEN_CJK: bool = True
+
     # Prompt templates for desc-based retrieval
     PROMPT_TEMPLATES: tuple[str, ...] = (
         "a studio photo of {q}, isolated object, no background",
